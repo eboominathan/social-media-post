@@ -1,0 +1,18 @@
+import React from "react";
+import { Link, Outlet } from "react-router-dom";
+
+export const PostLayout = () => {
+  return (
+    <>
+      <h1>PostLayout</h1>
+      <Link to="/postpage/1">Post 1</Link>
+      <br></br>
+      <Link to="/postpage/2">Post 2</Link>
+      <br></br>
+      <Link to="/postpage/3">Post 3</Link>
+      <br></br>
+      <Link to="/postpage/newpost">New Post</Link>
+      <Outlet />
+    </>
+  );
+};
