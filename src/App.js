@@ -12,35 +12,29 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { format } from "date-fns";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import api from  "./api/Posts"
 
 function App() {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "Post One Title",
-      body: "quia et suscipit suscipit recusandae consequuntur expedita et cum reprehenderit molestiae ut ut quas totam nostrum rerum est autem sunt rem eveniet architecto",
-      datetime: "Mar 11, 2024 11:17:00 AM",
-    },
-    {
-      id: 2,
-      title: "Post Two Title",
-      body: "est rerum tempore vitae sequi sint nihil reprehenderit dolor beatae ea dolores neque fugiat blanditiis voluptate porro vel nihil molestiae ut reiciendis qui aperiam non debitis possimus qui neque nisi nulla",
-      datetime: "Mar 11, 2024 11:17:00 AM",
-    },
-    {
-      id: 3,
-      title: "Post Three Title",
-      body: "et iusto sed quo iure voluptatem occaecati omnis eligendi aut ad voluptatem doloribus vel accusantium quis pariatur molestiae porro eius odio et labore et velit aut",
-      datetime: "Mar 11, 2024 11:17:00 AM",
-    },
-  ]);
-
+  const [posts, setPosts] = useState([]);
   const [search, setSearch] = useState("");
   const [searchResults, setsearchResults] = useState([]);
   const [postTitle, setPostTitle] = useState([]);
   const [postBody, setPostBody] = useState([]);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const response = await api.get("/posts");
+        setPosts(response.data);
+      } catch (err) {
+        if (err.response) {
+          console.log(`Error ${err.message}`);
+        }
+      }
+    };
+    fetchPosts();
+  }, []);
   useEffect(() => {
     const filteredResults = posts.filter(
       (post) =>
@@ -50,7 +44,6 @@ function App() {
     setsearchResults(filteredResults.reverse());
   }, [posts, search]);
 
-  
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -64,13 +57,11 @@ function App() {
   };
 
   const handleDelete = (id) => {
-
-    const postList = posts.filter(post => post.id !== id);
+    const postList = posts.filter((post) => post.id !== id);
     setPosts(postList);
-    navigate('/')
-  }
-  
-  
+    navigate("/");
+  };
+
   return (
     <div className="App">
       <Header title="Social Media" />
@@ -99,13 +90,8 @@ function App() {
             }
           />
           <Route
-          path=":id"
-            element={
-              <PostPage
-                posts={posts}
-                handleDelete={handleDelete}
-              />
-            }
+            path=":id"
+            element={<PostPage posts={posts} handleDelete={handleDelete} />}
           />
         </Route>
         <Route path="about" element={<About />} />
