@@ -1,9 +1,13 @@
-import React from 'react'
-
-export default function Missing() {
+ const Missing = () => {
   return (
-    <div>
-      <h1>Missing</h1>
-    </div>
+ <main className="Missing">
+  <h2>Page Not Found</h2>
+  <p>Well, thats disppointing</p>
+  <p>
+    Visit Our HomePage
+  </p>
+  </main>
   )
 }
+
+export default Missing
