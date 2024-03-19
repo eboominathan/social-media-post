@@ -43,9 +43,12 @@ function App() {
   }, []);
 
     useEffect(() => {
-        const filteredResults = posts.filter((post) =>
-            ((post.body).toLowerCase()).includes(search.toLowerCase())
-            || ((post.title).toLowerCase()).includes(search.toLowerCase()));
+      const filteredResults = posts.filter(post => {
+        // Check if post.body exists and is a string before calling toLowerCase()
+        const body = post.body && typeof post.body === 'string' ? post.body.toLowerCase() : '';
+        const title = post.title && typeof post.title === 'string' ? post.title.toLowerCase() : '';
+        return body.includes(search.toLowerCase()) || title.includes(search.toLowerCase());
+    });
 
         setSearchResults(filteredResults.reverse());
     }, [posts, search])
@@ -72,20 +75,20 @@ function App() {
   };
 
   const handleEdit = async (id) => {
-    const datetime = format(new Date(), "MMMM dd,yyyy pp");
-    const upadtedPost = { id, title: editTitle, body: editBody, datetime };
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
     try {
-      const response = api.put(`/posts/${id}`, upadtedPost);
-      if (response) {
-        setPosts(
-          posts.map((post) => (post.id === id ? { ...response.data } : post))
-        );
-        setEditTitle("");
-        setEditBody("");
-        navigate("/");
-      }
-    } catch (err) {}
-  };
+        const response = await api.put(`/posts/${id}`, updatedPost);
+        // Assuming the response.data contains the updated post object
+        const updatedPostData = response.data;
+        setPosts(posts.map(post => post.id === id ? updatedPostData : post));
+        setEditTitle('');
+        setEditBody('');
+        navigate('/');
+    } catch (err) {
+        console.log(`Error: ${err.message}`);
+    }
+}
 
   const handleDelete = async (id) => {
     try {
@@ -137,10 +140,10 @@ function App() {
             <EditPost
               posts={posts}
               handleEdit={handleEdit}
-              editTitle={editTitle}
-              setEditTitle={setEditTitle}
               editBody={editBody}
               setEditBody={setEditBody}
+              editTitle={editTitle}
+              setEditTitle={setEditTitle}
             />
           }
         />

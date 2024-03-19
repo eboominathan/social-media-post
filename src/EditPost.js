@@ -9,8 +9,10 @@ const EditPost = ({
   editBody,
   setEditBody,
 }) => {
-  const id = useParams();
-  const post = posts.find(post => (post.id).toString() === id);
+  const {id} = useParams();
+  const post = posts.find(post => post.id.toString() === id);
+ 
+
 
   useEffect(() => {
     if (post) {
