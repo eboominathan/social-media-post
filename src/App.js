@@ -15,7 +15,8 @@ import "./App.css";
 import { format } from "date-fns";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import api from "./api/Posts";
-
+import useWindowSize from "./hooks/userWindowSize";
+import useAxiosFetch from "./hooks/useAxiosFetch";
 
 function App() {
   const [posts, setPosts] = useState([]);
@@ -25,22 +26,13 @@ function App() {
   const [postBody, setPostBody] = useState([]);
   const [editTitle, setEditTitle] = useState([]);
   const [editBody, setEditBody] = useState([]);
-
   const navigate = useNavigate();
+  const {width} = useWindowSize();
+  const {data,fetchError,isLoading} = useAxiosFetch("http://localhost:3500/posts");
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await api.get("/posts");
-        setPosts(response.data);
-      } catch (err) {
-        if (err.response) {
-          console.log(`Error ${err.message}`);
-        }
-      }
-    };
-    fetchPosts();
-  }, []);
+ useEffect(() => {
+    setPosts(data); 
+ },[data]);
 
     useEffect(() => {
       const filteredResults = posts.filter(post => {
@@ -78,17 +70,18 @@ function App() {
     const datetime = format(new Date(), 'MMMM dd, yyyy pp');
     const updatedPost = { id, title: editTitle, datetime, body: editBody };
     try {
-        const response = await api.put(`/posts/${id}`, updatedPost);
-        // Assuming the response.data contains the updated post object
-        const updatedPostData = response.data;
-        setPosts(posts.map(post => post.id === id ? updatedPostData : post));
-        setEditTitle('');
-        setEditBody('');
-        navigate('/');
+      const response = await api.put(`/posts/${id}`, updatedPost);
+      // Ensure response.data doesn't contain circular references
+      const updatedData = { ...response.data };
+      setPosts(posts.map(post => post.id === id ? updatedData : post));
+      setEditTitle('');
+      setEditBody('');
+      navigate('/');
     } catch (err) {
-        console.log(`Error: ${err.message}`);
+      console.log(`Error: ${err.message}`);
     }
-}
+  }
+  
 
   const handleDelete = async (id) => {
     try {
@@ -103,7 +96,7 @@ function App() {
 
   return (
     <div className="App">
-      <Header title="Social Media" />
+      <Header title="Social Media" width={width}/>
       <Nav
         search={search}
         setSearch={setSearch}
@@ -113,7 +106,11 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Home posts={searchResults} setPosts={setPosts} />}
+          element={<Home
+             posts={searchResults} 
+             fetchError={fetchError}
+             isLoading={isLoading}
+              />}
         />
         <Route path="post">
           <Route

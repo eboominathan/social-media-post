@@ -16,10 +16,10 @@ const EditPost = ({
 
   useEffect(() => {
     if (post) {
-      setEditTitle(post.title);
-      setEditBody(post.body);
+        setEditTitle(post.title);
+        setEditBody(post.body);
     }
-  }, [post, setEditTitle, setEditBody]);
+}, [post, setEditTitle, setEditBody])
   return (
     <main className="EditPost">
       {editTitle && 
